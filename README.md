@@ -10,8 +10,16 @@ following setups:
 
 - Ubuntu 24.04 LTS with kubeadm: https://devopscube.com/setup-kubernetes-cluster-kubeadm/ - tested `kubeadm  1.30.8-1.1`
 - Fedora 41 with kubeadm: https://docs.fedoraproject.org/en-US/quick-docs/using-kubernetes-kubeadm/ - tested
-  `kubernetes-1.29.11-1.fc41`. Note: Fedora 41 offers packages from 1.29 to 1.32, but 1.32 seems to
-  be broken (unresolved CRI dependence - Container runtime).
+  `kubernetes-1.29.11-1.fc41`.
+
+  Testing verson 1.32 using:
+  ```shell
+  v=1.32; sudo dnf install --allowerasing kubernetes$v kubernetes$v-kubeadm kubernetes$v-client
+  sudo kubeadm config images pull
+  # if you get error: "found multiple CRI endpoints on the host", try:
+  sudo dnf remove containerd
+  # now follow above Fedora guide
+  ```
 
 Fedora warning: I had issues described
 on: https://devops.stackexchange.com/questions/14891/cni0-already-has-an-ip-address
