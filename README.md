@@ -12,7 +12,7 @@ following setups:
 2. Fedora 41 with kubeadm: https://docs.fedoraproject.org/en-US/quick-docs/using-kubernetes-kubeadm/
    but plaese wait before RPM installations with DNF.
 
-Please note that 1st Ubuntu guide uses Calico as overlay network, while Fedora guide prefers Flannel.
+Please note that 1st Ubuntu guide uses Calico as overlay network, while 2nd Fedora guide prefers Flannel.
 Sidenote: if you use Calico at scale you should read about "Calico route reflectors"
 on https://www.reddit.com/r/RedditEng/comments/11xx5o0/you_broke_reddit_the_piday_outage/?rdt=51169
 or https://www.tigera.io/blog/configuring-route-reflectors-in-calico/
@@ -46,14 +46,9 @@ sudo systemctl mask --now swap.target
 sudo reboot
 ```
 
-Next we have to follow guide and disable firewalld:
+Now we will follow official guide:
 ```shell
 sudo systemctl disable --now firewalld
-```
-
-On Fedora first we have to enable/insert required kernel modules and sysctl settings
-following guide from https://docs.fedoraproject.org/en-US/quick-docs/using-kubernetes-kubeadm/
-```shell
 sudo dnf install iptables iproute-tc
 
 sudo cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
@@ -80,10 +75,15 @@ packages use K8s 1.29 which is considered outdated.  To use version 1.32 we have
 ```shell
 v=1.32; sudo dnf install cri-o$v containernetworking-plugins
 v=1.32; sudo dnf install kubernetes$v kubernetes$v-kubeadm kubernetes$v-client
+# now we should lock package versions (from guide)
+v=1.32; sudo dnf versionlock add "kubernetes*-$v.*" "cri-o$v.*"
+# verify that there is no error like "No package found for ..."
 ```
 
-Now continue with Fedora guide on https://docs.fedoraproject.org/en-US/quick-docs/using-kubernetes-kubeadm/
+Now continue with Fedora guide on
+https://docs.fedoraproject.org/en-US/quick-docs/using-kubernetes-kubeadm/
 using:
+
 ```shell
 sudo systemctl enable --now crio
 sudo kubeadm config images pull
@@ -150,7 +150,7 @@ To deploy Applications to our K8s cluster we need to:
   ```
 - and verify that all Pods are READY `1/1` and STATUS `Running`
 
-To understand K8s component please see https://kubernetes.io/docs/concepts/overview/components/
+To understand K8s components please see https://kubernetes.io/docs/concepts/overview/components/
 We will use:
 - Deployment: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/ set of Pods
 - Pods are collocated Container(s) - running on same Node, see https://kubernetes.io/docs/concepts/workloads/pods/
