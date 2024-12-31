@@ -8,25 +8,28 @@ is fine).
 You need to have working K8s cluster (working `kubectl` command) - single node is fine. I tested
 following setups:
 
-- Ubuntu 24.04 LTS with kubeadm: https://devopscube.com/setup-kubernetes-cluster-kubeadm/ - tested `kubeadm  1.30.8-1.1`
-- Fedora 41 with kubeadm: https://docs.fedoraproject.org/en-US/quick-docs/using-kubernetes-kubeadm/ - tested
-  `kubernetes-1.29.11-1.fc41`.
+1. Ubuntu 24.04 LTS with kubeadm: https://devopscube.com/setup-kubernetes-cluster-kubeadm/ - tested `kubeadm  1.30.8-1.1`
+2. Fedora 41 with kubeadm: https://docs.fedoraproject.org/en-US/quick-docs/using-kubernetes-kubeadm/ - tested
+   `kubernetes-1.29.11-1.fc41` (switched to 1.32).
 
-  Testing verson 1.32 using:
-  ```shell
-  v=1.32; sudo dnf install --allowerasing kubernetes$v kubernetes$v-kubeadm kubernetes$v-client
-  sudo kubeadm config images pull
-  # if you get error: "found multiple CRI endpoints on the host", try:
-  sudo dnf remove containerd
-  # now follow above Fedora guide
-  ```
+Please note that 1st Ubuntu guide uses Calico as overlay network, while Fedora guide prefers Flannel.
+Sidenote: if you use Calico at scale you should read about "Calico route reflectors"
+on https://www.reddit.com/r/RedditEng/comments/11xx5o0/you_broke_reddit_the_piday_outage/?rdt=51169
+or https://www.tigera.io/blog/configuring-route-reflectors-in-calico/
+
+So on Fedora,  using version 1.32 we have to run:
+```shell
+v=1.32; sudo dnf install --allowerasing kubernetes$v kubernetes$v-kubeadm kubernetes$v-client
+sudo kubeadm config images pull
+# if you get error: "found multiple CRI endpoints on the host", try:
+sudo dnf remove containerd
+# now follow above Fedora guide
+```
 
 Fedora warning: I had issues described
 on: https://devops.stackexchange.com/questions/14891/cni0-already-has-an-ip-address
 I had to delete bridge using `sudo ip link delete cni0 type bridge` and reboot to avoid
 core-dns flapping...
-
-Please note that 1st Ubuntu guide uses Calico as overlay network, while Fedora guide prefers Flannel.
 
 In case of Fedora also disable "stub DNS" of useless systemd-resolved as described at the
 bottom of Fedora guide.
